@@ -1,0 +1,105 @@
+/* =========================================================
+   MODO 2 JOGADORES (carregado depois do style.css)
+   ========================================================= */
+
+#eu-moedas, #adv-moedas { color: #ffe27a; }
+
+.tabua.rival {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(0, 0, 0, 0.12) 46px 48px),
+    linear-gradient(180deg, #4f7fb2, #2f5a8a);
+  border-color: #1d3c5e;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 4px 0 #112a44;
+}
+
+#tempo.urgente { color: #ff8a80; animation: urgente 0.8s ease-in-out infinite alternate; }
+@keyframes urgente { from { transform: scale(1); } to { transform: scale(1.12); } }
+
+/* ---------- Energia dos dois ---------- */
+.energia > span:first-child { min-width: 70px; }
+.energia.rival { margin-top: 8px; }
+#adv-energia-barra { height: 100%; width: 100%; background: linear-gradient(#8fd0ff, #1976d2); transition: width 0.5s, background 0.3s; }
+#adv-energia-barra.baixa { background: linear-gradient(#ff8a80, #d32f2f); }
+#adv-energia-texto { min-width: 54px; text-align: right; color: #ffe27a; }
+.adv-acao { text-align: center; font-size: 0.82rem; color: #cfe6f7; margin-top: 8px; min-height: 1.1em; }
+
+/* ---------- Lago compartilhado ---------- */
+.cartao .v { display: block; margin-top: 4px; font-size: 0.58rem; font-weight: 800; color: #6b4423; }
+.cartao.esgotado { filter: grayscale(1); opacity: 0.65; }
+.cartao.esgotado .c { background: #c62828; }
+.dica-lago { margin-top: 10px; text-align: center; font-size: 0.78rem; color: #9fc3de; }
+
+/* ---------- Chat ---------- */
+#chat {
+  list-style: none; height: 180px; overflow-y: auto;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.25); border-radius: 12px;
+  font-size: 0.88rem;
+  -webkit-user-select: text; user-select: text;
+}
+.msg { padding: 3px 0; word-break: break-word; }
+.msg.chat b { color: #9fd0ff; }
+.msg.chat.minha b { color: #ffe27a; }
+.msg.evento { font-size: 0.8rem; color: #9fc3de; }
+.msg.raro { color: #ffd447; font-weight: 800; }
+.msg.sistema { color: #8be8a0; font-weight: 800; text-align: center; padding: 6px 0; }
+
+.rapidas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.rapida {
+  padding: 6px 12px; border-radius: 99px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1); color: #fff;
+  font: 800 0.85rem "Nunito", sans-serif; cursor: pointer;
+}
+.rapida:hover { background: rgba(255, 255, 255, 0.2); }
+
+.form-chat { display: flex; gap: 8px; margin-top: 10px; }
+.form-chat input {
+  flex: 1; min-width: 0; padding: 10px 12px;
+  border: 3px solid #5a3515; border-radius: 12px; outline: none;
+  background: #fff6dc; color: #4a2f12;
+  font: 800 0.95rem "Nunito", sans-serif;
+}
+.form-chat input:focus { outline: 3px solid #ffd447; }
+.form-chat .btn-jogo { font-size: 1rem; padding: 10px 16px; }
+
+/* ---------- Telas de espera e de fim ---------- */
+#tela-espera { z-index: 55; }
+#tela-fim { z-index: 60; }
+
+.carta-espera, .carta-fim {
+  width: min(92vw, 380px); padding: 24px; text-align: center;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(0, 0, 0, 0.12) 46px 48px),
+    linear-gradient(180deg, #b27a42, #8a5628);
+  border: 4px solid #5a3515; border-radius: 18px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 6px 0 #3d230c, 0 16px 30px rgba(0, 0, 0, 0.4);
+  color: #fff8e8;
+  animation: surgir 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.carta-espera h3 { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.5rem; margin: 14px 0 8px; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35); }
+.carta-espera p { font-size: 0.9rem; margin-bottom: 16px; }
+.spinner {
+  width: 56px; height: 56px; margin: 0 auto;
+  border: 5px solid rgba(255, 255, 255, 0.3); border-top-color: #ffd447; border-radius: 50%;
+  animation: girar 1s linear infinite;
+}
+
+.fim-titulo { font-family: "Lilita One", sans-serif; font-size: 2.6rem; letter-spacing: 2px; text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); }
+.fim-titulo.vitoria { color: #ffd447; }
+.fim-titulo.derrota { color: #ff9a8f; }
+.fim-titulo.empate  { color: #a9d6ff; }
+.fim-motivo { margin: 6px 0 14px; font-weight: 800; opacity: 0.9; }
+.fim-placar { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.fim-lado { min-width: 110px; padding: 10px; border-radius: 12px; background: rgba(0, 0, 0, 0.25); }
+.fim-lado small { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.fim-lado strong { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.5rem; color: #ffe27a; }
+.fim-x { font-family: "Lilita One", sans-serif; font-size: 1.4rem; opacity: 0.8; }
+.fim-bonus { min-height: 1.2em; margin-top: 12px; font-weight: 800; color: #ffe9b0; }
+.fim-botoes { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+
+@media (max-width: 520px) {
+  #chat { height: 150px; }
+  .fim-titulo { font-size: 2rem; }
+  .fim-lado { min-width: 90px; }
+}

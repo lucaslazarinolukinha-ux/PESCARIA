@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pescaria - Jogo de Pesca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="duelo.css">
+</head>
+<body>
+
+  <div class="jogo">
+
+    <!-- PLACAR -->
+    <header class="hud so-jogo">
+      <div class="tabua">
+        <div class="avatar">🧑‍🌾</div>
+        <div><small id="eu-nome">Você</small><strong>🪙 <span id="eu-moedas">0</span></strong></div>
+      </div>
+      <div class="tabua">
+        <div class="estrela">⏱️</div>
+        <div><small id="lago-resumo">Tempo</small><strong id="tempo">2:00</strong></div>
+      </div>
+      <div class="tabua rival">
+        <div class="avatar">🎣</div>
+        <div><small id="adv-nome">Aguardando...</small><strong>🪙 <span id="adv-moedas">0</span></strong></div>
+      </div>
+    </header>
+
+    <!-- CENA DE PESCA -->
+    <div class="cena-wrap" id="cena-wrap">
+      <div class="cena" id="cena">
+
+        <!-- Céu -->
+        <div class="sol"></div>
+        <div class="nuvem n1"></div>
+        <div class="nuvem n2"></div>
+        <div class="nuvem n3"></div>
+
+        <svg class="passaro" style="top:46px;animation-duration:38s,.5s;animation-delay:-10s,0s" viewBox="0 0 26 10" width="26" height="10" aria-hidden="true"><path d="M1 8 Q7 0 13 7 Q19 0 25 8" stroke="#34506b" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+        <svg class="passaro" style="top:72px;animation-duration:52s,.6s;animation-delay:-30s,0s;transform:scale(.7)" viewBox="0 0 26 10" width="26" height="10" aria-hidden="true"><path d="M1 8 Q7 0 13 7 Q19 0 25 8" stroke="#34506b" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+
+        <!-- Montanhas, colinas, árvores e símbolos reutilizáveis -->
+        <svg class="fundo" viewBox="0 0 800 150" width="800" height="150" aria-hidden="true">
+          <defs>
+            <linearGradient id="gMont" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#9fd0e6"/><stop offset="1" stop-color="#d4ecf0"/>
+            </linearGradient>
+            <linearGradient id="gHillA" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#74d487"/><stop offset="1" stop-color="#3f9f5a"/>
+            </linearGradient>
+            <linearGradient id="gHillB" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#55bb69"/><stop offset="1" stop-color="#2f8a49"/>
+            </linearGradient>
+            <linearGradient id="gHillC" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3fa25a"/><stop offset="1" stop-color="#25763e"/>
+            </linearGradient>
+
+            <symbol id="pino" viewBox="0 0 24 40">
+              <rect x="10.5" y="30" width="3" height="10" fill="#5a3a1c"/>
+              <path d="M12 2 L21 16 H15 L23 27 H1 L9 16 H3Z" fill="#2c7a4b"/>
+              <path d="M12 2 L3 16 H9 L1 27 H12Z" fill="#fff" opacity=".13"/>
+            </symbol>
+            <symbol id="arv" viewBox="0 0 30 44">
+              <rect x="13" y="26" width="4" height="18" rx="1" fill="#6b4423"/>
+              <circle cx="15" cy="17" r="13" fill="#3aa35d"/>
+              <circle cx="10" cy="20" r="8" fill="#49b86b"/>
+              <circle cx="20" cy="13" r="7" fill="#2f8f50"/>
+            </symbol>
+            <symbol id="palma" viewBox="0 0 44 52">
+              <path d="M22 52 Q20 34 26 18" stroke="#8a5a2e" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <g fill="#2fa35a">
+                <path d="M26 18 Q14 8 2 16 Q16 12 26 18Z"/>
+                <path d="M26 18 Q34 4 44 10 Q32 8 26 18Z"/>
+                <path d="M26 18 Q18 2 8 2 Q22 4 26 18Z"/>
+                <path d="M26 18 Q38 14 42 26 Q34 18 26 18Z"/>
+                <path d="M26 18 Q12 18 6 30 Q16 22 26 18Z"/>
+              </g>
+              <circle cx="25" cy="21" r="2.5" fill="#6b4423"/>
+              <circle cx="29" cy="20" r="2.5" fill="#6b4423"/>
+            </symbol>
+            <symbol id="peixe" viewBox="0 0 40 20">
+              <path d="M2 10 Q12 0 26 6 Q32 8 38 2 L36 10 L38 18 Q32 12 26 14 Q12 20 2 10Z" fill="currentColor"/>
+              <path d="M12 6 Q18 10 12 15" stroke="#fff" stroke-width="1" fill="none" opacity=".4"/>
+              <circle cx="9" cy="8.5" r="1.5" fill="#fff"/>
+              <circle cx="9" cy="8.5" r=".6" fill="#123"/>
+            </symbol>
+            <symbol id="alga" viewBox="0 0 30 50">
+              <path d="M15 50 Q5 38 15 26 Q25 14 15 2" stroke="#2e9e5a" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M8 50 Q0 40 8 32" stroke="#3cbf70" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M22 50 Q30 40 22 30" stroke="#278a4d" stroke-width="4" fill="none" stroke-linecap="round"/>
+            </symbol>
+            <symbol id="coral" viewBox="0 0 36 34">
+              <path d="M18 34 V16 M18 24 L8 14 M18 20 L28 8" stroke="#ff7a8a" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <circle cx="18" cy="14" r="4" fill="#ffa3b0"/>
+              <circle cx="8" cy="12" r="3.5" fill="#ffa3b0"/>
+              <circle cx="28" cy="6" r="3.5" fill="#ffa3b0"/>
+            </symbol>
+          </defs>
+
+          <!-- montanhas distantes -->
+          <path d="M0 150 V108 Q50 84 96 104 Q140 62 196 100 Q250 78 300 108 Q360 58 420 104 Q470 84 520 106 Q590 56 650 100 Q710 80 800 106 V150Z" fill="url(#gMont)" opacity=".9"/>
+
+          <!-- colinas -->
+          <path d="M0 150 V120 Q70 82 150 112 Q205 132 250 150Z" fill="url(#gHillA)"/>
+          <path d="M270 150 Q350 78 450 86 Q560 94 650 150Z" fill="url(#gHillB)"/>
+          <path d="M520 150 Q620 86 720 96 Q770 102 800 114 V150Z" fill="url(#gHillC)"/>
+
+          <!-- árvores -->
+          <use href="#arv" x="42" y="58" width="28" height="41"/>
+          <use href="#pino" x="92" y="70" width="16" height="28"/>
+          <use href="#pino" x="110" y="78" width="14" height="24"/>
+
+          <use href="#pino" x="344" y="72" width="18" height="30"/>
+          <use href="#pino" x="382" y="60" width="18" height="30"/>
+          <use href="#pino" x="402" y="64" width="16" height="27"/>
+          <use href="#pino" x="506" y="68" width="18" height="30"/>
+
+          <use href="#palma" x="668" y="52" width="40" height="48"/>
+          <use href="#arv" x="740" y="64" width="30" height="44"/>
+        </svg>
+
+        <!-- Água -->
+        <div class="mar"></div>
+
+        <svg class="barco" viewBox="0 0 44 34" width="44" height="34" aria-hidden="true">
+          <path d="M22 3 V24" stroke="#6b4423" stroke-width="1.6"/>
+          <path d="M22 4 L22 22 L7 22Z" fill="#ffffff"/>
+          <path d="M24 8 L24 22 L38 22Z" fill="#ffe9b0"/>
+          <path d="M22 3 L29 5 L22 7Z" fill="#e24f4f"/>
+          <path d="M4 24 H40 L35 31 H9Z" fill="#7a4a24"/>
+          <path d="M4 24 H40 L39 26 H5Z" fill="#a8713c"/>
+        </svg>
+
+        <div class="reflexo"></div>
+        <div class="raio" style="left:380px"></div>
+        <div class="raio" style="left:520px;animation-delay:-2s"></div>
+        <div class="raio" style="left:660px;animation-delay:-4s"></div>
+
+        <svg class="nada" style="top:200px;color:#ffb347;animation-duration:24s;animation-delay:-6s" viewBox="0 0 40 20" width="36" height="18" aria-hidden="true"><use href="#peixe"/></svg>
+        <svg class="nada esq" style="top:240px;color:#ff7aa8;animation-duration:30s;animation-delay:-14s" viewBox="0 0 40 20" width="32" height="16" aria-hidden="true"><use href="#peixe"/></svg>
+        <svg class="nada" style="top:285px;color:#7be0c3;animation-duration:36s;animation-delay:-20s" viewBox="0 0 40 20" width="40" height="20" aria-hidden="true"><use href="#peixe"/></svg>
+        <svg class="nada esq" style="top:215px;color:#ffd75a;animation-duration:40s;animation-delay:-3s" viewBox="0 0 40 20" width="30" height="15" aria-hidden="true"><use href="#peixe"/></svg>
+        <svg class="nada" style="top:310px;color:#9fb8ff;animation-duration:28s;animation-delay:-9s" viewBox="0 0 40 20" width="34" height="17" aria-hidden="true"><use href="#peixe"/></svg>
+
+        <div class="bolha" style="left:420px"></div>
+        <div class="bolha" style="left:480px;animation-delay:-1.5s"></div>
+        <div class="bolha" style="left:560px;animation-delay:-3s"></div>
+        <div class="bolha" style="left:640px;animation-delay:-2s"></div>
+        <div class="bolha" style="left:720px;animation-delay:-4s"></div>
+        <div class="bolha" style="left:350px;animation-delay:-2.5s;width:6px;height:6px"></div>
+
+        <div class="onda"></div>
+        <div class="onda b"></div>
+        <div class="onda c"></div>
+
+        <i class="glint" style="left:360px;top:160px;animation-delay:0s"></i>
+        <i class="glint" style="left:450px;top:172px;animation-delay:-1s"></i>
+        <i class="glint" style="left:520px;top:158px;animation-delay:-2s"></i>
+        <i class="glint" style="left:590px;top:182px;animation-delay:-.5s"></i>
+        <i class="glint" style="left:650px;top:166px;animation-delay:-1.6s"></i>
+        <i class="glint" style="left:720px;top:176px;animation-delay:-2.4s"></i>
+        <i class="glint" style="left:400px;top:196px;animation-delay:-.8s"></i>
+        <i class="glint" style="left:690px;top:200px;animation-delay:-1.9s"></i>
+
+        <div class="areia"></div>
+        <svg class="alga" style="left:380px" viewBox="0 0 30 50" width="30" height="50" aria-hidden="true"><use href="#alga"/></svg>
+        <svg class="alga" style="left:440px;animation-delay:-1.4s;height:40px" viewBox="0 0 30 50" width="24" height="40" aria-hidden="true"><use href="#alga"/></svg>
+        <svg class="alga" style="left:560px;animation-delay:-1s" viewBox="0 0 30 50" width="30" height="50" aria-hidden="true"><use href="#alga"/></svg>
+        <svg class="alga" style="left:640px;animation-delay:-2.2s;height:44px" viewBox="0 0 30 50" width="26" height="44" aria-hidden="true"><use href="#alga"/></svg>
+        <svg class="coral" style="left:500px" viewBox="0 0 36 34" width="36" height="34" aria-hidden="true"><use href="#coral"/></svg>
+        <svg class="coral" style="left:700px" viewBox="0 0 36 34" width="30" height="28" aria-hidden="true"><use href="#coral"/></svg>
+
+        <!-- Doca -->
+        <div class="doca"></div>
+        <div class="poste" style="left:30px"></div>
+        <div class="poste" style="left:120px"></div>
+        <div class="poste" style="left:230px"></div>
+
+        <div class="caixa"></div>
+        <svg class="balde" viewBox="0 0 30 30" width="26" height="26" aria-hidden="true">
+          <path d="M5 12 Q15 -2 25 12" stroke="#6d7f90" stroke-width="2" fill="none"/>
+          <path d="M4 11 H26 L23 28 H7Z" fill="#7ea6c8"/>
+          <path d="M4 11 H26 L25.4 15 H4.6Z" fill="#a9c8e0"/>
+          <ellipse cx="15" cy="11" rx="11" ry="2.5" fill="#3d5a73"/>
+          <path d="M12 11 L9 3 L15 7 L20 2 L19 11Z" fill="#ff9c4a"/>
+        </svg>
+
+        <!-- Pescador -->
+        <svg class="pescador" viewBox="0 0 60 70" width="60" height="70" aria-hidden="true">
+          <ellipse cx="30" cy="69" rx="17" ry="2.5" fill="#000" opacity=".18"/>
+          <!-- pernas e botas -->
+          <rect x="19" y="52" width="10" height="14" rx="3" fill="#2b4a7a"/>
+          <rect x="31" y="52" width="10" height="14" rx="3" fill="#24406b"/>
+          <rect x="18" y="63" width="12" height="6" rx="3" fill="#5a3515"/>
+          <rect x="30" y="63" width="12" height="6" rx="3" fill="#4a2c10"/>
+          <!-- corpo -->
+          <path d="M14 56 V40 Q14 31 23 31 H37 Q46 31 46 40 V56Z" fill="#e24f4f"/>
+          <path d="M15 46 H45 V56 H15Z" fill="#35639c"/>
+          <rect x="21" y="32" width="4" height="15" fill="#35639c"/>
+          <rect x="35" y="32" width="4" height="15" fill="#35639c"/>
+          <circle cx="23" cy="47" r="1.3" fill="#ffd447"/>
+          <circle cx="37" cy="47" r="1.3" fill="#ffd447"/>
+          <!-- braços e mãos (seguram a vara) -->
+          <path d="M41 38 Q50 40 55 34" stroke="#c93a3a" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+          <circle cx="57" cy="31.5" r="4" fill="#f5c8a0"/>
+          <path d="M38 41 Q46 44 53 37" stroke="#e24f4f" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+          <circle cx="54" cy="35" r="3.6" fill="#f5c8a0"/>
+          <!-- cabeça e chapéu -->
+          <g class="cab">
+            <circle cx="30" cy="23" r="10.5" fill="#f5c8a0"/>
+            <circle cx="35" cy="24" r="1.6" fill="#3a2410"/>
+            <circle cx="37.5" cy="27.5" r="2" fill="#ff9f9f" opacity=".6"/>
+            <path d="M33 29 Q36 31 38.5 29" stroke="#a5503a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <path d="M18 15 Q18 3 30 3 Q42 3 42 15Z" fill="#f6d06a"/>
+            <rect x="18" y="10.5" width="24" height="4" fill="#d64545"/>
+            <ellipse cx="30" cy="15" rx="23" ry="5" fill="#e8b53c"/>
+            <ellipse cx="30" cy="14" rx="23" ry="4" fill="#f2c85a" opacity=".6"/>
+          </g>
+        </svg>
+
+        <div class="vara"></div>
+        <div class="linha"></div>
+        <div class="boia"></div>
+        <div class="splash"><i></i><i></i><i></i></div>
+
+        <div class="balao duvida"><i></i><i></i><i></i></div>
+        <div class="balao exclama">!</div>
+
+        <div id="peixe-pulo" class="peixe-pulo">🐟</div>
+
+        <div class="vinheta"></div>
+      </div>
+
+      <!-- BARRA DE FORÇA (canto direito da cena) -->
+      <div id="medidor" class="medidor">
+        <span class="medidor-titulo">FORÇA</span>
+        <div class="medidor-trilho">
+          <div class="faixas">
+            <div id="medidor-bloqueio" class="bloqueio"></div>
+          </div>
+          <div id="ponteiro" class="ponteiro"></div>
+        </div>
+        <strong id="valor-forca" class="valor-forca">0%</strong>
+      </div>
+
+      <div id="toast" class="toast"></div>
+    </div>
+
+    <!-- ENERGIA DOS DOIS JOGADORES -->
+    <section class="painel-pesca so-jogo">
+      <div class="energia">
+        <span>⚡ Você</span>
+        <div class="energia-trilho"><div id="energia-barra"></div></div>
+        <span id="energia-texto">100/100</span>
+      </div>
+      <div class="energia rival">
+        <span id="adv-rotulo">🎣 Rival</span>
+        <div class="energia-trilho"><div id="adv-energia-barra"></div></div>
+        <span id="adv-energia-texto">100/100</span>
+      </div>
+      <p id="adv-acao" class="adv-acao"></p>
+
+      <p id="medidor-texto" class="medidor-texto">Aperte PESCAR e acerte o traço no vermelho para lançar longe!</p>
+
+      <div id="cansaco" class="cansaco">
+        <p>😮‍💨 O pescador está cansado! Ele só consegue lançar com pouca força.</p>
+        <button type="button" id="btn-descansar-cansaco" class="btn-jogo azul">😴 Descansar</button>
+        <button type="button" id="btn-lancar-leve" class="btn-jogo laranja">🎣 Lançar de novo (leve)</button>
+      </div>
+    </section>
+
+    <!-- AÇÕES -->
+    <div class="barra so-jogo">
+      <button id="btn-pescar" class="btn-jogo laranja grande">🎣 PESCAR</button>
+      <button id="btn-descansar" class="btn-jogo azul">😴 Descansar</button>
+      <button id="btn-sair" class="btn-jogo vermelho">Sair</button>
+    </div>
+    <p class="dica so-jogo">Atalhos: <b>ESPAÇO</b> pesca e lança · <b>D</b> descansa · <b>ESC</b> cancela</p>
+
+    <!-- LAGO COMPARTILHADO -->
+    <section class="painel so-jogo">
+      <h2>🌊 Lago compartilhado</h2>
+      <div id="lago" class="album-grid"></div>
+      <p class="dica-lago">O lago é o mesmo para os dois: o que um pescar, o outro não pega mais!</p>
+    </section>
+
+    <!-- CHAT -->
+    <section class="painel so-jogo">
+      <h2>💬 Chat e eventos</h2>
+      <ul id="chat"></ul>
+      <div class="rapidas">
+        <button type="button" class="rapida" data-t="😏">😏</button>
+        <button type="button" class="rapida" data-t="🔥">🔥</button>
+        <button type="button" class="rapida" data-t="👏">👏</button>
+        <button type="button" class="rapida" data-t="😭">😭</button>
+        <button type="button" class="rapida" data-t="Boa pescaria!">Boa pescaria!</button>
+        <button type="button" class="rapida" data-t="Vai perder! 😎">Vai perder! 😎</button>
+      </div>
+      <form id="form-chat" class="form-chat" autocomplete="off">
+        <input id="chat-input" type="text" maxlength="140" placeholder="Digite uma mensagem para o rival..." autocomplete="off">
+        <button type="submit" class="btn-jogo azul">Enviar</button>
+      </form>
+    </section>
+
+    <!-- ÁLBUM -->
+    <section class="painel so-jogo">
+      <h2>📖 Álbum de Peixes</h2>
+      <div id="album" class="album-grid"></div>
+    </section>
+
+    <!-- RANKING -->
+    <section class="painel so-jogo">
+      <h2>🏆 Ranking de Pescadores</h2>
+      <ol id="ranking" class="ranking"><li class="vazio">Carregando...</li></ol>
+    </section>
+
+    <!-- DIÁRIO -->
+    <section class="painel so-jogo">
+      <h2>📜 Diário de Pesca</h2>
+      <ul id="historico"></ul>
+    </section>
+
+  </div>
+
+  <!-- TELA INICIAL -->
+  <div id="tela-login" class="overlay">
+    <div class="titulo-jogo">
+      <span class="t1">🎣 PESCARIA</span>
+      <span class="t2">DUELO DE PESCADORES</span>
+    </div>
+    <form id="form-login" class="carta-login">
+      <label for="input-nome">Nome do pescador</label>
+      <input id="input-nome" type="text" placeholder="Digite seu nome" maxlength="20" autocomplete="off" required>
+      <small class="dica-login">Já jogou antes? Use o mesmo nome para continuar de onde parou.</small>
+      <button type="submit" class="btn-jogo laranja grande">▶ JOGAR</button>
+      <p id="erro" class="erro"></p>
+    </form>
+  </div>
+
+  <!-- ESPERANDO ADVERSÁRIO -->
+  <div id="tela-espera" class="overlay oculto">
+    <div class="carta-espera">
+      <div class="spinner"></div>
+      <h3>Procurando adversário...</h3>
+      <p>Chame um amigo para abrir o jogo e entrar com outro nome. A partida começa assim que ele chegar!</p>
+      <button type="button" id="btn-cancelar-espera" class="btn-jogo vermelho">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- FIM DA PARTIDA -->
+  <div id="tela-fim" class="overlay oculto">
+    <div class="carta-fim">
+      <div id="fim-titulo" class="fim-titulo">🏆 VITÓRIA!</div>
+      <p id="fim-motivo" class="fim-motivo"></p>
+      <div class="fim-placar">
+        <div class="fim-lado"><small id="fim-eu-nome">Você</small><strong id="fim-eu-moedas">🪙 0</strong></div>
+        <div class="fim-x">x</div>
+        <div class="fim-lado"><small id="fim-adv-nome">Rival</small><strong id="fim-adv-moedas">🪙 0</strong></div>
+      </div>
+      <p id="fim-bonus" class="fim-bonus"></p>
+      <div class="fim-botoes">
+        <button type="button" id="btn-de-novo" class="btn-jogo verde">▶ Jogar de novo</button>
+        <button type="button" id="btn-sair-fim" class="btn-jogo vermelho">Sair</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO DA PESCARIA -->
+  <div id="modal" class="overlay oculto">
+    <div id="carta" class="carta">
+      <div id="faiscas" class="faiscas"></div>
+      <div class="titulo-carta">VOCÊ PESCOU!</div>
+      <div class="palco-peixe">
+        <div class="brilho"></div>
+        <div id="carta-emoji" class="peixe-grande">🐟</div>
+      </div>
+      <div id="carta-nome" class="nome-peixe"></div>
+      <div id="carta-raridade" class="faixa"></div>
+      <div id="carta-ganho" class="ganho"></div>
+      <button id="btn-continuar" class="btn-jogo verde">Continuar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

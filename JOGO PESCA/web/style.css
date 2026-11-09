@@ -1,0 +1,561 @@
+/* =========================================================
+   PESCARIA - estilo de jogo
+   ========================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  font-family: "Nunito", "Trebuchet MS", sans-serif;
+  font-weight: 600;
+  color: #eaf6ff;
+  background: linear-gradient(180deg, #0a3a66 0%, #061f3a 100%) fixed;
+  display: flex;
+  justify-content: center;
+
+  /* jogo: nada de selecionar texto/imagens ao clicar e arrastar */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+input { -webkit-user-select: text; user-select: text; }
+.cena-wrap, .cena-wrap * { -webkit-user-drag: none; }
+.cena-wrap ::selection { background: transparent; }
+.cena * { pointer-events: none; }
+
+.jogo { width: 100%; max-width: 860px; padding: 18px 16px 40px; }
+.oculto { display: none !important; }
+body:not(.logado) .so-jogo { display: none; }
+body.logado #tela-login { display: none; }
+
+h2 { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.15rem; color: #ffe9b0; margin-bottom: 10px; letter-spacing: 1px; }
+
+/* ---------- Raridades ---------- */
+.r-COMUM    { --cor: #7d8b99; }
+.r-INCOMUM  { --cor: #2fb350; }
+.r-RARO     { --cor: #2f8de0; }
+.r-EPICO    { --cor: #a24fe0; }
+.r-LENDARIO { --cor: #e8a200; }
+
+/* ---------- HUD (placas de madeira) ---------- */
+.hud { display: grid; grid-template-columns: 1.5fr 1fr 1.2fr; gap: 10px; margin-bottom: 14px; }
+.tabua {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  color: #fff8e8;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(0, 0, 0, 0.12) 46px 48px),
+    linear-gradient(180deg, #b27a42, #8a5628);
+  border: 3px solid #5a3515;
+  border-radius: 14px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 4px 0 #3d230c;
+  min-width: 0;
+}
+.tabua small { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+.tabua strong {
+  display: block; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.25rem;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.avatar, .estrela { font-size: 1.7rem; line-height: 1; }
+.moeda {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: "Lilita One", sans-serif; color: #a46a00; font-size: 1.1rem;
+  background: radial-gradient(circle at 35% 30%, #fff1a8, #ffc933 55%, #d69500);
+  border: 3px solid #a46a00;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+#stat-moedas { color: #ffe27a; }
+
+/* =========================================================
+   CENA
+   ========================================================= */
+.cena-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 800 / 360;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 0 0 5px #6b4423, 0 0 0 8px #3d230c, 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+.cena {
+  position: absolute; left: 0; top: 0;
+  width: 800px; height: 360px;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #4fb7ff 0, #a8e0ff 80px, #fff2d6 150px);
+}
+.cena > * { position: absolute; }
+
+/* ---------- Céu ---------- */
+.sol {
+  left: 650px; top: 22px; width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle, #fffdf0 25%, #ffe27a 72%);
+  box-shadow: 0 0 40px 16px rgba(255, 235, 120, 0.65), 0 0 90px 40px rgba(255, 220, 120, 0.3);
+}
+.sol::before {
+  content: ""; position: absolute; inset: -36px; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 240, 160, 0.4) 0 6deg, transparent 6deg 18deg);
+  -webkit-mask: radial-gradient(circle, transparent 36%, #000 40%, transparent 72%);
+          mask: radial-gradient(circle, transparent 36%, #000 40%, transparent 72%);
+  animation: girar 40s linear infinite;
+}
+.nuvem {
+  left: 0; width: 100px; height: 26px; border-radius: 30px;
+  background: linear-gradient(#fff, #e6f3ff); opacity: 0.95;
+  box-shadow: 0 6px 10px rgba(80, 140, 200, 0.15);
+  animation: nuvem linear infinite;
+}
+.nuvem::before, .nuvem::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+.nuvem::before { left: 16px; top: -16px; width: 44px; height: 36px; }
+.nuvem::after  { left: 48px; top: -24px; width: 50px; height: 44px; }
+.n1 { top: 34px; animation-duration: 55s; }
+.n2 { top: 84px; animation-duration: 80s; animation-delay: -30s; opacity: 0.7; }
+.n3 { top: 56px; animation-duration: 65s; animation-delay: -50s; opacity: 0.85; }
+
+.passaro { left: 0; animation-name: voar, bater; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; animation-direction: normal, alternate; }
+
+.fundo { left: 0; top: 0; width: 800px; height: 150px; }
+
+/* ---------- Água ---------- */
+.mar {
+  left: 0; top: 150px; width: 800px; height: 210px;
+  background: linear-gradient(180deg, #6fd6f5 0%, #35b0e8 12%, #1b82c4 45%, #0d5a9c 75%, #093e73 100%);
+}
+.mar::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+}
+.barco { left: 0; top: 132px; animation: deriva 90s linear infinite, balanco-barco 3s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+.reflexo {
+  left: 640px; top: 150px; width: 84px; height: 130px;
+  background: repeating-linear-gradient(180deg, rgba(255, 246, 190, 0.75) 0 3px, transparent 3px 11px);
+  -webkit-mask: linear-gradient(180deg, #000, transparent);
+          mask: linear-gradient(180deg, #000, transparent);
+  animation: reflexo 2.6s ease-in-out infinite alternate;
+}
+.raio {
+  top: 150px; width: 50px; height: 200px;
+  background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+  transform: skewX(-18deg);
+  animation: raio 6s ease-in-out infinite alternate;
+}
+.nada { left: 0; opacity: 0.6; animation: nadar linear infinite; }
+.nada.esq { animation-name: nadar-esq; }
+.bolha {
+  bottom: 24px; width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  animation: subir 5s ease-in infinite;
+}
+.onda {
+  left: 0; top: 144px; width: 800px; height: 14px;
+  background: radial-gradient(circle at 10px -3px, transparent 11px, rgba(255, 255, 255, 0.7) 12px, rgba(255, 255, 255, 0.7) 14px, transparent 15px) 0 0 / 20px 14px repeat-x;
+  animation: onda 2.5s linear infinite;
+}
+.onda.b { top: 178px; opacity: 0.3; animation-duration: 4s; animation-direction: reverse; }
+.onda.c { top: 162px; opacity: 0.22; animation-duration: 6s; }
+
+.glint { width: 14px; height: 2px; border-radius: 2px; background: #fff; opacity: 0; animation: cintilar 3s ease-in-out infinite; }
+.glint::before { content: ""; position: absolute; left: 6px; top: -6px; width: 2px; height: 14px; border-radius: 2px; background: #fff; }
+
+.areia {
+  left: 0; bottom: 0; width: 800px; height: 28px;
+  background:
+    radial-gradient(ellipse 6px 3px at 60px 14px, #b99a58 99%, transparent),
+    radial-gradient(ellipse 8px 4px at 210px 18px, #a98b4c 99%, transparent),
+    radial-gradient(ellipse 5px 3px at 420px 12px, #b99a58 99%, transparent),
+    radial-gradient(ellipse 9px 4px at 640px 17px, #a98b4c 99%, transparent),
+    linear-gradient(#e8cf8f, #c9a85e);
+  border-top: 3px solid #f2dfa8;
+  border-radius: 40% 40% 0 0 / 12px 12px 0 0;
+}
+.alga { bottom: 22px; transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite alternate; }
+.coral { bottom: 22px; }
+
+/* ---------- Doca ---------- */
+.doca {
+  left: 0; top: 150px; width: 270px; height: 18px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 41px, rgba(60, 30, 8, 0.55) 41px 44px),
+    linear-gradient(180deg, #d9a46a 0 5px, #b8814a 5px 14px, #7e5129 14px 18px);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+}
+.poste {
+  top: 166px; width: 14px; height: 76px; border-radius: 3px;
+  background: linear-gradient(180deg, #8a5a2e 0, #5a3515 30%, #2f3f4f 100%);
+}
+.poste::before {
+  content: ""; position: absolute; left: -1px; right: -1px; top: 8px; height: 6px; border-radius: 2px;
+  background: repeating-linear-gradient(45deg, #d9c08a 0 3px, #a88c52 3px 6px);
+}
+.poste::after {
+  content: ""; position: absolute; left: -9px; right: -9px; top: 14px; height: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%;
+  animation: marola 3s ease-out infinite;
+}
+.caixa {
+  left: 22px; top: 135px; width: 26px; height: 17px; border-radius: 2px;
+  background:
+    linear-gradient(90deg, transparent 0 4px, rgba(60, 30, 8, 0.5) 4px 6px, transparent 6px 20px, rgba(60, 30, 8, 0.5) 20px 22px, transparent 22px),
+    linear-gradient(180deg, #c98f56 0 7px, #a8713c 7px 8px, #b8814a 8px);
+  border: 2px solid #6b4423;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+.balde { left: 232px; top: 126px; }
+
+/* ---------- Pescador ---------- */
+.pescador { left: 130px; top: 80px; }
+.pescador .cab {
+  transform-box: fill-box; transform-origin: 50% 100%;
+  animation: assentir 3s ease-in-out infinite alternate;
+}
+.cena.pescando .pescador .cab { animation: assentir 0.6s ease-in-out infinite alternate; }
+.cena.fisgou .pescador .cab { animation: surpresa 0.5s ease-out; }
+
+/* ---------- Vara, linha e boia ---------- */
+.vara {
+  left: 187px; top: 111px; width: 150px; height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, #4a2c10, #8a5a2e 55%, #c99a5e);
+  transform-origin: 0 50%; transform: rotate(-35deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.linha { left: 309px; top: 27px; width: 2px; height: 123px; background: rgba(255, 255, 255, 0.85); }
+.boia {
+  left: 300px; top: 142px; width: 20px; height: 24px;
+  border-radius: 50% 50% 46% 46%; border: 2px solid #e8e8e8;
+  background: linear-gradient(180deg, #ff4a3d 0 50%, #fff 50%);
+  box-shadow: inset -3px -2px 0 rgba(0, 0, 0, 0.12), 0 2px 3px rgba(0, 0, 0, 0.25);
+  animation: boiar 2.2s ease-in-out infinite;
+}
+.boia::before {
+  content: ""; position: absolute; left: 50%; top: -9px; width: 2px; height: 8px; margin-left: -1px;
+  border-radius: 2px; background: #ff4a3d;
+}
+.boia::after {
+  content: ""; position: absolute; left: -9px; top: 5px; width: 36px; height: 9px;
+  border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 50%;
+  animation: marolinha 2.2s ease-out infinite;
+}
+
+/* a linha e a boia acompanham o lançamento */
+.linha { transform-origin: 0 0; transition: height 0.5s ease-out, transform 0.5s ease-out; }
+.boia { transition: left 0.5s ease-out; }
+.splash, .peixe-pulo { transition: left 0.5s ease-out; }
+
+/* círculos de água ao redor da boia */
+.splash { left: 310px; top: 150px; width: 0; height: 0; }
+.splash i {
+  position: absolute; left: -10px; top: -10px; width: 20px; height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.9); border-radius: 50%; opacity: 0;
+}
+.splash i:nth-child(2) { animation-delay: 0.35s; }
+.splash i:nth-child(3) { animation-delay: 0.7s; }
+
+.peixe-pulo {
+  left: 310px; top: 112px; font-size: 44px; line-height: 1; opacity: 0;
+  transform: translate(-50%, 0);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.35));
+}
+
+/* balões do pescador */
+.balao {
+  left: 168px; top: 50px; min-width: 36px; height: 26px; padding: 0 9px;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  background: #fff; border-radius: 14px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+  opacity: 0; transform: translateY(6px) scale(0.8);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.balao::after {
+  content: ""; position: absolute; left: 10px; bottom: -6px;
+  border: 6px solid transparent; border-top-color: #fff; border-bottom: 0;
+}
+.balao.duvida i { width: 5px; height: 5px; border-radius: 50%; background: #4a6a88; animation: pontos 1s ease-in-out infinite; }
+.balao.duvida i:nth-child(2) { animation-delay: 0.15s; }
+.balao.duvida i:nth-child(3) { animation-delay: 0.3s; }
+.balao.exclama { font-family: "Lilita One", sans-serif; font-size: 1.25rem; color: #e53935; }
+.cena.pescando .balao.duvida { opacity: 1; transform: none; }
+.cena.fisgou .balao.exclama { opacity: 1; transform: none; animation: balao-pop 0.5s ease-out; }
+
+.vinheta {
+  left: 0; top: 0; width: 800px; height: 360px;
+  background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(5, 25, 60, 0.35) 100%);
+}
+
+/* estados da cena */
+.cena.pescando .boia { animation: mergulhar 0.45s ease-in-out infinite alternate; }
+.cena.pescando .splash i { animation: anel 1.6s ease-out infinite; }
+.cena.fisgou .splash i { animation: anel 0.9s ease-out; }
+.cena.fisgou .peixe-pulo { animation: pular 1s ease-out; }
+.cena.lendario { animation: tremer 0.5s; }
+.cena.lendario .vinheta { animation: flash-ouro 0.9s ease-out; }
+
+.toast {
+  position: absolute; top: 12px; left: 50%; z-index: 5;
+  transform: translate(-50%, -20px);
+  background: rgba(0, 0, 0, 0.7); color: #fff; font-weight: 800;
+  padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;
+  opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap;
+}
+.toast.mostrar { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Barra de força (vertical, no canto da cena) ---------- */
+.medidor {
+  position: absolute; top: 10px; right: 10px; bottom: 10px; z-index: 4;
+  width: 48px; padding: 6px 6px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  background: rgba(10, 25, 45, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  opacity: 0.6;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+.medidor.ativo { opacity: 1; box-shadow: 0 0 16px rgba(255, 255, 255, 0.55); }
+.medidor-titulo { font-family: "Lilita One", sans-serif; font-size: 0.62rem; letter-spacing: 1px; color: #ffe9b0; }
+.medidor-trilho { position: relative; flex: 1; width: 22px; }
+.faixas {
+  position: absolute; inset: 0; overflow: hidden;
+  border: 3px solid #5a3515; border-radius: 99px;
+  background: linear-gradient(to top, #43b05c 0 35%, #f2c230 35% 70%, #e5493a 70% 100%);
+}
+.bloqueio {
+  position: absolute; top: 0; left: 0; right: 0; height: 0; transition: height 0.4s;
+  background: repeating-linear-gradient(45deg, rgba(20, 20, 30, 0.85) 0 6px, rgba(70, 70, 80, 0.85) 6px 12px);
+}
+.ponteiro {
+  position: absolute; left: -9px; right: -9px; bottom: 0; height: 7px;
+  transform: translateY(50%);
+  background: #fff; border: 2px solid #3d230c; border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+}
+.valor-forca { font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 0.95rem; color: #ffe27a; }
+
+/* ---------- Botões ---------- */
+.btn-jogo {
+  --sombra: #333;
+  font-family: "Lilita One", sans-serif; font-weight: 400;
+  font-size: 1.1rem; letter-spacing: 0.5px; color: #fff;
+  border: none; border-radius: 14px; padding: 12px 20px; cursor: pointer;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 0 var(--sombra), 0 8px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.2s;
+}
+.btn-jogo:hover:not(:disabled) { filter: brightness(1.1); }
+.btn-jogo:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--sombra), 0 3px 8px rgba(0, 0, 0, 0.35); }
+.btn-jogo:disabled { filter: grayscale(0.6) brightness(0.8); cursor: not-allowed; }
+.btn-jogo.grande { font-size: 1.5rem; padding: 14px 34px; }
+.laranja  { --sombra: #b34f00; background: linear-gradient(#ffb43a, #f57c00); }
+.azul     { --sombra: #0d4c94; background: linear-gradient(#4cb8ff, #1976d2); }
+.vermelho { --sombra: #8e1b1b; background: linear-gradient(#ff6b6b, #d32f2f); }
+.verde    { --sombra: #1b6623; background: linear-gradient(#6edc6e, #2e9e3a); }
+
+.barra { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 22px 0 8px; }
+.barra .grande { flex: 1 1 220px; }
+.dica { text-align: center; font-size: 0.78rem; color: #9fc3de; margin-bottom: 4px; }
+
+/* ---------- Painéis ---------- */
+.painel {
+  margin-top: 16px; padding: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+}
+
+.album-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.cartao {
+  position: relative; text-align: center; padding: 10px 4px 8px;
+  color: #4a2f12;
+  background: linear-gradient(#fff6dc, #ecd9a8);
+  border: 3px solid var(--cor);
+  border-radius: 12px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+}
+.cartao .e { display: block; font-size: 2rem; line-height: 1.2; }
+.cartao .n { display: block; font-family: "Lilita One", sans-serif; font-size: 0.78rem; }
+.cartao .r { display: block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--cor); }
+.cartao .c {
+  position: absolute; top: -9px; right: -9px; width: 24px; height: 24px;
+  display: grid; place-items: center;
+  font-family: "Lilita One", sans-serif; font-size: 0.8rem; color: #fff;
+  background: var(--cor); border: 2px solid #fff; border-radius: 50%;
+}
+.cartao.bloqueado { filter: grayscale(1); opacity: 0.8; }
+.cartao.bloqueado .e { filter: brightness(0) opacity(0.4); }
+.cartao.bloqueado .c { display: none; }
+.cartao.bump { animation: surgir 0.4s cubic-bezier(0.2, 1.4, 0.4, 1); }
+
+#historico { list-style: none; max-height: 160px; overflow-y: auto; }
+#historico li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 4px; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+#historico li b { color: var(--cor, #dff0ff); font-weight: 800; }
+#historico .valor { color: #ffe27a; font-weight: 800; }
+#historico .vazio { color: #9fc3de; justify-content: center; }
+
+/* ---------- Ranking ---------- */
+.ranking { list-style: none; counter-reset: pos; }
+.ranking li {
+  counter-increment: pos;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; margin-bottom: 6px;
+  border-radius: 10px; background: rgba(0, 0, 0, 0.22);
+}
+.ranking li::before {
+  content: counter(pos);
+  flex: none; width: 26px; height: 26px; display: grid; place-items: center;
+  border-radius: 50%; background: #5a3515; color: #fff8e8;
+  font-family: "Lilita One", sans-serif; font-size: 0.85rem;
+}
+.ranking li:nth-child(1)::before { background: #e8a200; }
+.ranking li:nth-child(2)::before { background: #9aa7b4; }
+.ranking li:nth-child(3)::before { background: #b06a30; }
+.ranking .nome { flex: 1; min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ranking .nivel { font-size: 0.8rem; color: #9fc3de; }
+.ranking .moedas { font-family: "Lilita One", sans-serif; color: #ffe27a; }
+.ranking li.eu { outline: 2px solid #ffd447; background: rgba(255, 212, 71, 0.12); }
+.ranking li.vazio { justify-content: center; color: #9fc3de; }
+.ranking li.vazio::before { display: none; }
+.dica-login { text-align: center; font-size: 0.72rem; color: #ffe9b0; opacity: 0.9; }
+
+/* ---------- Telas sobrepostas ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  padding: 16px;
+  background: rgba(4, 24, 48, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.titulo-jogo { text-align: center; }
+.t1 {
+  display: block; font-family: "Lilita One", sans-serif; letter-spacing: 4px;
+  font-size: clamp(2.6rem, 11vw, 5.2rem); color: #ffd447;
+  -webkit-text-stroke: 3px #7a3e00; paint-order: stroke fill;
+  text-shadow: 0 6px 0 #7a3e00, 0 12px 20px rgba(0, 0, 0, 0.5);
+}
+.t2 { display: block; margin-top: 10px; font-family: "Lilita One", sans-serif; letter-spacing: 6px; font-size: 1.1rem; color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5); }
+
+.carta-login {
+  width: min(92vw, 340px); display: flex; flex-direction: column; gap: 12px; padding: 20px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(0, 0, 0, 0.12) 46px 48px),
+    linear-gradient(180deg, #b27a42, #8a5628);
+  border: 4px solid #5a3515; border-radius: 18px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 6px 0 #3d230c, 0 16px 30px rgba(0, 0, 0, 0.4);
+}
+.carta-login label { text-align: center; font-family: "Lilita One", sans-serif; color: #fff8e8; letter-spacing: 1px; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35); }
+.carta-login input {
+  width: 100%; padding: 13px; text-align: center; font: 800 1.1rem "Nunito", sans-serif;
+  color: #4a2f12; background: #fff6dc; border: 3px solid #5a3515; border-radius: 12px; outline: none;
+}
+.carta-login input:focus { outline: 3px solid #ffd447; }
+.erro { min-height: 1.2em; text-align: center; font-weight: 800; color: #ffd0c8; }
+
+/* ---------- Carta do peixe ---------- */
+.carta {
+  position: relative; overflow: hidden; text-align: center;
+  width: min(92vw, 360px); padding: 22px 26px;
+  color: #4a2f12;
+  background: linear-gradient(#fff6dc, #ecd9a8);
+  border: 5px solid #8a5628; border-radius: 24px;
+  box-shadow: 0 0 0 5px #5a3515, 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: surgir 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.titulo-carta { font-family: "Lilita One", sans-serif; letter-spacing: 2px; color: #8a5628; }
+.palco-peixe { position: relative; height: 140px; display: grid; place-items: center; }
+.brilho {
+  position: absolute; width: 200px; height: 200px; border-radius: 50%; opacity: 0.4;
+  background: repeating-conic-gradient(var(--cor) 0 10deg, transparent 10deg 20deg);
+  -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%);
+          mask: radial-gradient(circle, #000 25%, transparent 70%);
+  animation: girar 8s linear infinite;
+}
+.peixe-grande { position: relative; font-size: 5rem; line-height: 1; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.3)); animation: balancar 1.6s ease-in-out infinite; }
+.nome-peixe { font-family: "Lilita One", sans-serif; font-size: 2rem; color: var(--cor); }
+.faixa {
+  display: inline-block; margin: 6px 0 10px; padding: 4px 18px; border-radius: 20px;
+  font-family: "Lilita One", sans-serif; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; background: var(--cor);
+}
+.ganho { margin-bottom: 14px; font-family: "Lilita One", sans-serif; font-size: 1.5rem; color: #a46a00; }
+.carta.r-LENDARIO { box-shadow: 0 0 0 5px #5a3515, 0 0 50px 10px rgba(255, 200, 40, 0.6); }
+
+.faiscas { position: absolute; inset: 0; pointer-events: none; }
+.faiscas span { position: absolute; font-size: 1.2rem; animation: piscar 1.2s ease-in-out infinite; }
+
+/* ---------- Energia e cansaço ---------- */
+.painel-pesca {
+  margin-top: 16px; padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+}
+.energia { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.85rem; }
+.energia-trilho { flex: 1; height: 14px; background: rgba(0, 0, 0, 0.35); border: 2px solid #5a3515; border-radius: 99px; overflow: hidden; }
+#energia-barra { height: 100%; width: 100%; background: linear-gradient(#7be07b, #2e9e3a); transition: width 0.5s, background 0.3s; }
+#energia-barra.baixa { background: linear-gradient(#ff8a80, #d32f2f); }
+#energia-texto { min-width: 54px; text-align: right; color: #ffe27a; }
+
+.medidor-texto { text-align: center; font-size: 0.82rem; color: #cfe6f7; margin-top: 10px; }
+
+.cansaco { display: none; margin-top: 12px; padding: 12px; text-align: center; background: rgba(0, 0, 0, 0.3); border-radius: 12px; }
+.cansaco.mostrar { display: block; animation: surgir 0.3s ease-out; }
+.cansaco p { font-weight: 800; margin-bottom: 10px; }
+.cansaco .btn-jogo { margin: 4px; font-size: 1rem; padding: 10px 16px; }
+
+/* ---------- Animações ---------- */
+@keyframes onda { to { background-position: 40px 0; } }
+@keyframes nuvem { from { transform: translateX(-160px); } to { transform: translateX(960px); } }
+@keyframes nadar { from { transform: translateX(-60px) scaleX(-1); } to { transform: translateX(860px) scaleX(-1); } }
+@keyframes nadar-esq { from { transform: translateX(860px); } to { transform: translateX(-60px); } }
+@keyframes subir { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-170px); opacity: 0; } }
+@keyframes raio { from { opacity: 0.2; } to { opacity: 0.8; } }
+@keyframes sway { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+@keyframes boiar { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(3px); } }
+@keyframes mergulhar { from { transform: translateY(0); } to { transform: translateY(14px); } }
+@keyframes anel { 0% { opacity: 1; transform: scale(1, 0.4); } 100% { opacity: 0; transform: scale(7, 2.8); } }
+@keyframes pular {
+  0%   { opacity: 1; transform: translate(-50%, 20px) rotate(0); }
+  50%  { opacity: 1; transform: translate(-50%, -120px) rotate(-30deg); }
+  100% { opacity: 0; transform: translate(-50%, 0) rotate(30deg); }
+}
+/* usa "translate" para não apagar o scale da cena */
+@keyframes tremer { 0%, 100% { translate: 0 0; } 25% { translate: -5px 0; } 75% { translate: 5px 0; } }
+@keyframes surgir { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes girar { to { transform: rotate(360deg); } }
+@keyframes balancar { 0%, 100% { transform: rotate(-6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-6px); } }
+@keyframes piscar { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1.1); } }
+
+@keyframes cintilar { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 0.95; transform: scale(1); } }
+@keyframes voar { from { translate: -40px 0; } to { translate: 860px 0; } }
+@keyframes bater { from { transform: scaleY(1); } to { transform: scaleY(0.55); } }
+@keyframes deriva { from { translate: -60px 0; } to { translate: 860px 0; } }
+@keyframes balanco-barco { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+@keyframes reflexo { from { opacity: 0.45; transform: scaleX(0.8); } to { opacity: 0.9; transform: scaleX(1.1); } }
+@keyframes marola { 0% { opacity: 0.8; transform: scale(0.7); } 100% { opacity: 0; transform: scale(1.4); } }
+@keyframes marolinha { 0% { opacity: 0.8; transform: scale(0.7); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes assentir { from { transform: rotate(-1.5deg); } to { transform: rotate(2deg); } }
+@keyframes surpresa { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-4px) scale(1.12); } 100% { transform: translateY(0) scale(1); } }
+@keyframes pontos { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-3px); opacity: 1; } }
+@keyframes balao-pop { 0% { transform: translateY(6px) scale(0.5); } 60% { transform: translateY(-3px) scale(1.15); } 100% { transform: none; } }
+@keyframes flash-ouro {
+  0%   { box-shadow: inset 0 0 120px 40px rgba(255, 200, 40, 0.85); }
+  100% { box-shadow: inset 0 0 0 0 rgba(255, 200, 40, 0); }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 520px) {
+  .hud { grid-template-columns: 1.4fr 1fr 1.1fr; gap: 6px; }
+  .tabua { padding: 6px 8px; gap: 6px; }
+  .tabua strong { font-size: 1rem; }
+  .avatar, .estrela { font-size: 1.3rem; }
+  .moeda { width: 26px; height: 26px; font-size: 0.9rem; }
+  .album-grid { gap: 6px; }
+  .cartao .e { font-size: 1.5rem; }
+  .cartao .n { font-size: 0.62rem; }
+  .cartao .r { font-size: 0.5rem; }
+
+  .medidor { width: 36px; top: 6px; right: 6px; bottom: 6px; padding: 4px 4px 5px; gap: 3px; }
+  .medidor-titulo { font-size: 0.5rem; }
+  .medidor-trilho { width: 16px; }
+  .ponteiro { left: -6px; right: -6px; height: 6px; }
+  .valor-forca { font-size: 0.75rem; }
+}
